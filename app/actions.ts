@@ -1,12 +1,17 @@
 "use server";
 
-export async function getWeatherData(city: string) {
+import { WeatherData } from "@/types/weather";
+
+export async function getWeatherData(city: string): Promise<{
+    data?: WeatherData
+}> {
     try {
-        const res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${process.env.OPENWEATHERMAP_API_KEY}`);
+        const res = await 
+        fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${process.env.OPENWEATHERMAP_API_KEY}`);
         const data = await res.json();
         return { data };
     } catch (error) {
         console.error("Error fetching weather data:", error);
-        return { data: null };
+        return { };
     }
 }
