@@ -1,7 +1,12 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { Droplets, Search, Thermometer, Wind } from "lucide-react";
 import { getWeatherData } from "./actions";
+import type { WeatherData } from "@/types/weather";
+import { Card, CardContent } from "@/components/ui/card";
 
 function SubmitButton() {
   return (
@@ -12,25 +17,77 @@ function SubmitButton() {
 }
 
 export default function Home() {
-  const handleSearch = async (formData: FormData) => {
-    "use server";
+  const [weather, setWeather] = useState<WeatherData | null>(null);
 
-    const city = formData.get("city") as string;
-    await getWeatherData(city);
+  async function handleSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const city = String(formData.get("city") ?? "").trim();
+
+    if (city) {
+      const { data } = await getWeatherData(city);
+      if (data) setWeather(data);
+    }
   }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-400 to-blue-500 flex items-center justify-center">
       <div className="w-full max-w-md space-y-4">
-        <form action={handleSearch} className="flex gap-2">
-          <Input 
-          name="city"
-          type="text"
-          placeholder="Enter city name"
-          className="bg-white/90"
-          required
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <Input
+            name="city"
+            type="text"
+            placeholder="Enter city name"
+            className="bg-white/90"
+            required
           />
           <SubmitButton />
         </form>
+
+        {weather && (
+          <Card className="bg-white/50 backdrop-blur">
+            <CardContent className="p-6">
+              <div className="mb-4 text-center">
+                <h2>{weather.name}</h2>
+                <div className="flex items-center justify-center gap-2 mt-2">
+                  <img
+                    src={`https://openweathermap.org/img/wn/${weather.weather[0].icon}@2x.png`}
+                    alt={weather.weather[0].description}
+                    width={64}
+                    height={64}
+                  />
+                  <div>{Math.round(weather.main.temp)}°C</div>
+                </div>
+                <div className="text-gray-500 mt-1 capitalize">
+                  {weather.weather[0].description}
+                </div>
+              </div>
+              <div className="mt-6 grid grid-cols-3 gap-4">
+                <div className="text-center">
+                  <Thermometer className="mx-auto h-6 w-6 text-orange-500" />
+                  <div className="mt-2 text-sm text-gray-500">Feels like</div>
+                  <div className="font-semibold">
+                    {Math.round(weather.main.feels_like)}°C
+                  </div>
+                </div>
+                <div className="text-center">
+                  <Droplets className="mx-auto h-6 w-6 text-blue-500" />
+                  <div className="mt-2 text-sm text-gray-500">Humidity</div>
+                  <div className="font-semibold">
+                    {Math.round(weather.main.humidity)}%
+                  </div>
+                </div>
+                <div className="text-center">
+                  <Wind className="mx-auto h-6 w-6 text-orange-500" />
+                  <div className="mt-2 text-sm text-gray-500">Wind Speed</div>
+                  <div className="font-semibold">
+                    {Math.round(weather.wind.speed)} m/s
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );
