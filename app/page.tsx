@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
-import Image from "next/image";
+import { getWeatherData } from "./actions";
 
 function SubmitButton() {
   return (
@@ -12,8 +12,11 @@ function SubmitButton() {
 }
 
 export default function Home() {
-  const handleSearch = () => {
-    console.log("Search submitted");
+  const handleSearch = async (formData: FormData) => {
+    "use server";
+
+    const city = formData.get("city") as string;
+    await getWeatherData(city);
   }
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-400 to-blue-500 flex items-center justify-center">
