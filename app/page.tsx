@@ -7,11 +7,14 @@ import { Droplets, Search, Thermometer, Wind } from "lucide-react";
 import { getWeatherData } from "./actions";
 import type { WeatherData } from "@/types/weather";
 import { Card, CardContent } from "@/components/ui/card";
+import { useFormStatus } from "react-dom";
 
 function SubmitButton() {
+const { pending } = useFormStatus();
+
   return (
-    <Button type="submit">
-      <Search className="h-4 w-4" />
+    <Button type="submit" disabled={pending}>
+      <Search className="w-4 h-4" />
     </Button>
   );
 }
